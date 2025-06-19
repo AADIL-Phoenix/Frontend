@@ -7,7 +7,8 @@ import {
 } from '@mui/material';
 import { 
   Add, CheckCircle, 
-  Person, Email, Assignment, Star, Close 
+  Person, Email, Assignment, Star, Close,
+  Work, BusinessCenter, Task
 } from '@mui/icons-material';
 
 const TeamManagement = () => {
@@ -157,23 +158,24 @@ const TeamManagement = () => {
         {/* Content */}
         <Box sx={{ p: 3 }}>
           <Typography variant="h6" sx={{ color: '#64748b', mb: 3, fontWeight: 600 }}>
-            Demo Preview
+            Team Members
           </Typography>
 
           <Grid container spacing={3}>
             {teamMembers.map((member) => (
-              <Grid item xs={12} sm={6} md={3} key={member.id}>
+              <Grid item key={member.id} xs={12} sm={6} md={3}>
                 <Card sx={{ 
+                  height: '100%',
                   borderRadius: '16px', 
                   boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-                  transition: 'transform 0.3s',
+                  transition: 'transform 0.3s, box-shadow 0.3s',
                   border: '1px solid #e2e8f0',
                   '&:hover': { 
                     transform: 'translateY(-5px)',
                     boxShadow: '0 8px 25px rgba(0,0,0,0.1)'
                   }
                 }}>
-                  <CardContent sx={{ p: 3 }}>
+                  <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                       <Badge
                         overlap="circular"
@@ -203,11 +205,17 @@ const TeamManagement = () => {
                     <Typography variant="h6" align="center" sx={{ fontWeight: 700, mb: 0.5 }}>
                       {member.name}
                     </Typography>
+                    
                     <Typography variant="body2" align="center" sx={{ 
                       color: '#64748b', 
                       mb: 2,
-                      fontWeight: 500
+                      fontWeight: 500,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 0.5
                     }}>
+                      <BusinessCenter fontSize="small" />
                       {member.role}
                     </Typography>
                     
@@ -218,9 +226,13 @@ const TeamManagement = () => {
                       mb: 1,
                       px: 1
                     }}>
-                      <Typography variant="h5" sx={{ fontWeight: 700, fontSize: '1.5rem' }}>
-                        {member.tasks}
-                      </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <Task fontSize="small" color="action" />
+                        <Typography variant="h5" sx={{ fontWeight: 700, fontSize: '1.5rem' }}>
+                          {member.tasks}
+                        </Typography>
+                      </Box>
+                      
                       <Typography variant="h5" sx={{ 
                         fontWeight: 700, 
                         fontSize: '1.5rem',
@@ -299,186 +311,226 @@ const TeamManagement = () => {
       </Box>
 
       {/* Add Member Dialog */}
-<Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth
-  PaperProps={{ sx: { borderRadius: '16px' } }}>
-  <DialogTitle sx={{ 
-    display: 'flex', 
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    fontWeight: 600,
-    fontSize: '1.25rem',
-    backgroundColor: '#f8fafc',
-    borderBottom: '1px solid #e2e8f0',
-    py: 2,
-    px: 3
-  }}>
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <Person sx={{ mr: 1, color: '#4f46e5' }} />
-      Add New Team Member
-    </Box>
-    <IconButton onClick={handleCloseDialog} size="small">
-      <Close />
-    </IconButton>
-  </DialogTitle>
-  <DialogContent sx={{ py: 3, px: 3 }}>
-    <Grid container spacing={3}>
-      <Grid item xs={12}>
-        <TextField
-          fullWidth
-          label="Full Name"
-          name="name"
-          value={newMember.name}
-          onChange={handleInputChange}
-          variant="outlined"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Person color="action" />
-              </InputAdornment>
-            ),
-          }}
-          InputLabelProps={{
-            shrink: true,
-            style: { fontWeight: 500, color: '#334155' }
-          }}
-          placeholder="Enter team member's full name"
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <TextField
-          fullWidth
-          label="Role"
-          name="role"
-          value={newMember.role}
-          onChange={handleInputChange}
-          variant="outlined"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Work color="action" />
-              </InputAdornment>
-            ),
-          }}
-          InputLabelProps={{
-            shrink: true,
-            style: { fontWeight: 500, color: '#334155' }
-          }}
-          placeholder="Enter team member's role"
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <TextField
-          fullWidth
-          label="Email"
-          name="email"
-          value={newMember.email}
-          onChange={handleInputChange}
-          variant="outlined"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Email color="action" />
-              </InputAdornment>
-            ),
-          }}
-          InputLabelProps={{
-            shrink: true,
-            style: { fontWeight: 500, color: '#334155' }
-          }}
-          placeholder="Enter team member's email"
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <TextField
-          fullWidth
-          label="Tasks Assigned"
-          name="tasks"
-          type="number"
-          value={newMember.tasks}
-          onChange={handleInputChange}
-          variant="outlined"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <Assignment color="action" />
-              </InputAdornment>
-            ),
-          }}
-          InputLabelProps={{
-            shrink: true,
-            style: { fontWeight: 500, color: '#334155' }
-          }}
-          placeholder="Enter number of tasks"
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <TextField
-          fullWidth
-          label="Completion %"
-          name="completion"
-          type="number"
-          value={newMember.completion}
-          onChange={handleInputChange}
-          variant="outlined"
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <CheckCircle color="action" />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">%</InputAdornment>
-            )
-          }}
-          InputLabelProps={{
-            shrink: true,
-            style: { fontWeight: 500, color: '#334155' }
-          }}
-          placeholder="Enter completion percentage"
-          inputProps={{ min: 0, max: 100 }}
-        />
-      </Grid>
-    </Grid>
-  </DialogContent>
-  <DialogActions sx={{ 
-    px: 3, 
-    py: 2,
-    borderTop: '1px solid #e2e8f0'
-  }}>
-    <Button 
-      onClick={handleCloseDialog}
-      variant="outlined"
-      sx={{ 
-        color: '#4a5568', 
-        borderColor: '#cbd5e0',
-        fontWeight: 600,
-        px: 3,
-        borderRadius: '8px',
-        '&:hover': {
-          backgroundColor: '#f1f5f9',
-          borderColor: '#a0aec0'
-        }
-      }}
-    >
-      Cancel
-    </Button>
-    <Button 
-      onClick={handleAddMember}
-      variant="contained"
-      sx={{ 
-        backgroundColor: '#4f46e5',
-        fontWeight: 600,
-        px: 3,
-        borderRadius: '8px',
-        '&:hover': {
-          backgroundColor: '#4338ca'
-        }
-      }}
-    >
-      Add Member
-    </Button>
-  </DialogActions>
-</Dialog>
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth
+        PaperProps={{ 
+          sx: { 
+            borderRadius: '16px', 
+            width: '100%', 
+            maxWidth: '500px',
+            minHeight:'500px',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+            backgroundColor: '#f8fafc',
+          } 
+        }}
+      >
+        <DialogTitle sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          fontWeight: 600,
+          fontSize: '1.25rem',
+          backgroundColor: '#f8fafc',
+          borderBottom: '1px solid #e2e8f0',
+          py: 2,
+          px: 3
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Person sx={{ mr: 1, color: '#4f46e5' }} />
+            Add New Team Member
+          </Box>
+          <IconButton onClick={handleCloseDialog} size="small">
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        
+        <DialogContent sx={{ py: 3, px: 3 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            <TextField
+              fullWidth
+              label="Full Name"
+              name="name"
+              value={newMember.name}
+              onChange={handleInputChange}
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Person color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              InputLabelProps={{
+                shrink: true,
+                style: { 
+                  fontWeight: 500, 
+                  color: '#334155',
+                  backgroundColor: 'white',
+                  padding: '0 4px',
+                  marginLeft: '-4px'
+                }
+              }}
+              placeholder="John Smith"
+              sx={{ mt: 2 }}
+
+            />
+            
+            <TextField
+              fullWidth
+              label="Role"
+              name="role"
+              value={newMember.role}
+              onChange={handleInputChange}
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Work color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              InputLabelProps={{
+                shrink: true,
+                style: { 
+                  fontWeight: 500, 
+                  color: '#334155',
+                  backgroundColor: 'white',
+                  padding: '0 4px',
+                  marginLeft: '-4px'
+                }
+              }}
+              placeholder="Frontend Developer"
+            />
+            
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              value={newMember.email}
+              onChange={handleInputChange}
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Email color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              InputLabelProps={{
+                shrink: true,
+                style: { 
+                  fontWeight: 500, 
+                  color: '#334155',
+                  backgroundColor: 'white',
+                  padding: '0 4px',
+                  marginLeft: '-4px'
+                }
+              }}
+              placeholder="john.smith@example.com"
+            />
+            
+            <TextField
+              fullWidth
+              label="Tasks Assigned"
+              name="tasks"
+              type="number"
+              value={newMember.tasks}
+              onChange={handleInputChange}
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Assignment color="action" />
+                  </InputAdornment>
+                ),
+              }}
+              InputLabelProps={{
+                shrink: true,
+                style: { 
+                  fontWeight: 500, 
+                  color: '#334155',
+                  backgroundColor: 'white',
+                  padding: '0 4px',
+                  marginLeft: '-4px'
+                }
+              }}
+              placeholder="5"
+            />
+            
+            <TextField
+              fullWidth
+              label="Completion %"
+              name="completion"
+              type="number"
+              value={newMember.completion}
+              onChange={handleInputChange}
+              variant="outlined"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <CheckCircle color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">%</InputAdornment>
+                )
+              }}
+              InputLabelProps={{
+                shrink: true,
+                style: { 
+                  fontWeight: 500, 
+                  color: '#334155',
+                  backgroundColor: 'white',
+                  padding: '0 4px',
+                  marginLeft: '-4px'
+                }
+              }}
+              placeholder="75"
+              inputProps={{ min: 0, max: 100 }}
+            />
+          </Box>
+        </DialogContent>
+        
+        <DialogActions sx={{ 
+          px: 3, 
+          py: 2,
+          borderTop: '1px solid #e2e8f0'
+        }}>
+          <Button 
+            onClick={handleCloseDialog}
+            variant="outlined"
+            sx={{ 
+              color: '#4a5568', 
+              borderColor: '#cbd5e0',
+              fontWeight: 600,
+              px: 3,
+              py: 1,
+              borderRadius: '8px',
+              '&:hover': {
+                backgroundColor: '#f1f5f9',
+                borderColor: '#a0aec0'
+              }
+            }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleAddMember}
+            variant="contained"
+            sx={{ 
+              backgroundColor: '#4f46e5',
+              fontWeight: 600,
+              px: 3,
+              py: 1,
+              borderRadius: '8px',
+              '&:hover': {
+                backgroundColor: '#4338ca'
+              }
+            }}
+          >
+            Add Member
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
