@@ -13,9 +13,17 @@ import {
   Stepper,
   Step,
   StepLabel,
-  Grid
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemSecondaryAction,
+  Divider
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const theme = createTheme({
   palette: {
@@ -75,22 +83,115 @@ const Assign = () => {
   const [formData, setFormData] = useState({
     projectId: '',
     userId: '',
-    task: '',
-    dueDate: '',
-    submissionDate: '',
-    priority: 'medium',
-    description: ''
+    tasks: [
+      {
+        id: 1,
+        task: '',
+        dueDate: '',
+        submissionDate: '',
+        priority: 'medium',
+        description: ''
+      }
+    ]
   });
   const [errors, setErrors] = useState({});
+  const [taskErrors, setTaskErrors] = useState([{}]);
 
   const steps = ['Project Details', 'Task Information', 'Review & Assign'];
 
+  // Function to add a new task
+  const addTask = () => {
+    const newTaskId = formData.tasks.length > 0 
+      ? Math.max(...formData.tasks.map(t => t.id)) + 1 
+      : 1;
+    
+    setFormData({
+      ...formData,
+      tasks: [
+        ...formData.tasks,
+        {
+          id: newTaskId,
+          task: '',
+          dueDate: '',
+          submissionDate: '',
+          priority: 'medium',
+          description: ''
+        }
+      ]
+    });
+    
+    setTaskErrors([...taskErrors, {}]);
+  };
+
+  // Function to remove a task
+  const removeTask = (taskId) => {
+    if (formData.tasks.length <= 1) return;
+    
+    setFormData({
+      ...formData,
+      tasks: formData.tasks.filter(task => task.id !== taskId)
+    });
+    
+    // Also remove corresponding errors
+    const taskIndex = formData.tasks.findIndex(t => t.id === taskId);
+    if (taskIndex !== -1) {
+      const newTaskErrors = [...taskErrors];
+      newTaskErrors.splice(taskIndex, 1);
+      setTaskErrors(newTaskErrors);
+    }
+  };
+
+  // Handle change for project/user fields
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+    
+    if (errors[name]) {
+      setErrors({
+        ...errors,
+        [name]: null
+      });
+    }
+  };
+
+  // Handle change for task fields
+  const handleTaskChange = (taskId, e) => {
+    const { name, value } = e.target;
+    
+    const updatedTasks = formData.tasks.map(task => {
+      if (task.id === taskId) {
+        return { ...task, [name]: value };
+      }
+      return task;
+    });
+    
+    setFormData({
+      ...formData,
+      tasks: updatedTasks
+    });
+    
+    // Clear error when field is changed
+    const taskIndex = formData.tasks.findIndex(t => t.id === taskId);
+    if (taskIndex !== -1 && taskErrors[taskIndex]?.[name]) {
+      const newTaskErrors = [...taskErrors];
+      newTaskErrors[taskIndex] = {
+        ...newTaskErrors[taskIndex],
+        [name]: null
+      };
+      setTaskErrors(newTaskErrors);
+    }
+  };
+
   const handleNext = () => {
-    // Validate current step
     let valid = true;
     const newErrors = {};
-    
+    const newTaskErrors = Array(formData.tasks.length).fill({}).map(() => ({}));
+
     if (activeStep === 0) {
+      // Validate project and user fields
       if (!formData.projectId) {
         newErrors.projectId = 'Project ID is required';
         valid = false;
@@ -100,21 +201,25 @@ const Assign = () => {
         valid = false;
       }
     } else if (activeStep === 1) {
-      if (!formData.task) {
-        newErrors.task = 'Task description is required';
-        valid = false;
-      }
-      if (!formData.dueDate) {
-        newErrors.dueDate = 'Due date is required';
-        valid = false;
-      }
-      if (!formData.submissionDate) {
-        newErrors.submissionDate = 'Submission date is required';
-        valid = false;
-      }
+      // Validate each task
+      formData.tasks.forEach((task, index) => {
+        if (!task.task) {
+          newTaskErrors[index].task = 'Task description is required';
+          valid = false;
+        }
+        if (!task.dueDate) {
+          newTaskErrors[index].dueDate = 'Due date is required';
+          valid = false;
+        }
+        if (!task.submissionDate) {
+          newTaskErrors[index].submissionDate = 'Submission date is required';
+          valid = false;
+        }
+      });
     }
     
     setErrors(newErrors);
+    setTaskErrors(newTaskErrors);
     
     if (valid) {
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -125,36 +230,26 @@ const Assign = () => {
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-    
-    // Clear error when field is changed
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: null
-      });
-    }
-  };
-
   const handleSubmit = () => {
     console.log('Form submitted:', formData);
-    // Here you would typically send the data to your backend
-    alert('Task assigned successfully!');
+    alert(`${formData.tasks.length} task(s) assigned successfully!`);
+    
     // Reset form
     setFormData({
       projectId: '',
       userId: '',
-      task: '',
-      dueDate: '',
-      submissionDate: '',
-      priority: 'medium',
-      description: ''
+      tasks: [
+        {
+          id: 1,
+          task: '',
+          dueDate: '',
+          submissionDate: '',
+          priority: 'medium',
+          description: ''
+        }
+      ]
     });
+    setTaskErrors([{}]);
     setActiveStep(0);
   };
 
@@ -191,79 +286,119 @@ const Assign = () => {
         );
       case 1:
         return (
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                name="task"
-                label="Task Description"
-                variant="outlined"
-                value={formData.task}
-                onChange={handleChange}
-                error={!!errors.task}
-                helperText={errors.task}
-                multiline
-                rows={3}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                name="dueDate"
-                label="Task Due Date"
-                type="date"
-                variant="outlined"
-                value={formData.dueDate}
-                onChange={handleChange}
-                error={!!errors.dueDate}
-                helperText={errors.dueDate}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                name="submissionDate"
-                label="Task Submission Date"
-                type="date"
-                variant="outlined"
-                value={formData.submissionDate}
-                onChange={handleChange}
-                error={!!errors.submissionDate}
-                helperText={errors.submissionDate}
-                InputLabelProps={{ shrink: true }}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <FormControl fullWidth error={!!errors.priority}>
-                <InputLabel>Priority</InputLabel>
-                <Select
-                  name="priority"
-                  value={formData.priority}
-                  onChange={handleChange}
-                  label="Priority"
-                >
-                  <MenuItem value="low">Low</MenuItem>
-                  <MenuItem value="medium">Medium</MenuItem>
-                  <MenuItem value="high">High</MenuItem>
-                  <MenuItem value="critical">Critical</MenuItem>
-                </Select>
-                {errors.priority && <FormHelperText>{errors.priority}</FormHelperText>}
-              </FormControl>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                name="description"
-                label="Additional Details"
-                variant="outlined"
-                value={formData.description}
-                onChange={handleChange}
-                multiline
-                rows={4}
-              />
-            </Grid>
-          </Grid>
+          <Box>
+            <Typography variant="subtitle1" gutterBottom>
+              Assign multiple tasks to the user
+            </Typography>
+            
+            {formData.tasks.map((task, index) => (
+              <Box key={task.id} sx={{ 
+                mb: 4, 
+                p: 3, 
+                border: '1px solid #e0e0e0', 
+                borderRadius: 2,
+                backgroundColor: index % 2 === 0 ? '#fafafa' : '#ffffff'
+              }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                  <Typography variant="h6">Task #{index + 1}</Typography>
+                  {formData.tasks.length > 1 && (
+                    <IconButton 
+                      onClick={() => removeTask(task.id)}
+                      color="error"
+                      size="small"
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  )}
+                </Box>
+                
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name="task"
+                      label="Task Description"
+                      variant="outlined"
+                      value={task.task}
+                      onChange={(e) => handleTaskChange(task.id, e)}
+                      error={!!(taskErrors[index]?.task)}
+                      helperText={taskErrors[index]?.task}
+                      multiline
+                      rows={2}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      name="dueDate"
+                      label="Task Due Date"
+                      type="date"
+                      variant="outlined"
+                      value={task.dueDate}
+                      onChange={(e) => handleTaskChange(task.id, e)}
+                      error={!!(taskErrors[index]?.dueDate)}
+                      helperText={taskErrors[index]?.dueDate}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <TextField
+                      fullWidth
+                      name="submissionDate"
+                      label="Task Submission Date"
+                      type="date"
+                      variant="outlined"
+                      value={task.submissionDate}
+                      onChange={(e) => handleTaskChange(task.id, e)}
+                      error={!!(taskErrors[index]?.submissionDate)}
+                      helperText={taskErrors[index]?.submissionDate}
+                      InputLabelProps={{ shrink: true }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <FormControl fullWidth error={!!(taskErrors[index]?.priority)}>
+                      <InputLabel>Priority</InputLabel>
+                      <Select
+                        name="priority"
+                        value={task.priority}
+                        onChange={(e) => handleTaskChange(task.id, e)}
+                        label="Priority"
+                      >
+                        <MenuItem value="low">Low</MenuItem>
+                        <MenuItem value="medium">Medium</MenuItem>
+                        <MenuItem value="high">High</MenuItem>
+                        <MenuItem value="critical">Critical</MenuItem>
+                      </Select>
+                      {taskErrors[index]?.priority && (
+                        <FormHelperText>{taskErrors[index].priority}</FormHelperText>
+                      )}
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      name="description"
+                      label="Additional Details"
+                      variant="outlined"
+                      value={task.description}
+                      onChange={(e) => handleTaskChange(task.id, e)}
+                      multiline
+                      rows={3}
+                    />
+                  </Grid>
+                </Grid>
+              </Box>
+            ))}
+            
+            <Button
+              variant="outlined"
+              startIcon={<AddCircleOutlineIcon />}
+              onClick={addTask}
+              sx={{ mt: 1 }}
+            >
+              Add Another Task
+            </Button>
+          </Box>
         );
       case 2:
         return (
@@ -271,6 +406,7 @@ const Assign = () => {
             <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
               Review Task Assignment
             </Typography>
+            
             <Box sx={{ mb: 3 }}>
               <Typography variant="subtitle1" color="textSecondary">
                 Project ID
@@ -286,40 +422,56 @@ const Assign = () => {
                 {formData.userId}
               </Typography>
               
-              <Typography variant="subtitle1" color="textSecondary">
-                Task Description
-              </Typography>
-              <Typography variant="body1" gutterBottom sx={{ fontWeight: 500 }}>
-                {formData.task}
+              <Divider sx={{ my: 3 }} />
+              
+              <Typography variant="h6" gutterBottom>
+                Tasks to Assign ({formData.tasks.length})
               </Typography>
               
-              <Typography variant="subtitle1" color="textSecondary">
-                Due Date
-              </Typography>
-              <Typography variant="body1" gutterBottom sx={{ fontWeight: 500 }}>
-                {formData.dueDate}
-              </Typography>
-              
-              <Typography variant="subtitle1" color="textSecondary">
-                Submission Date
-              </Typography>
-              <Typography variant="body1" gutterBottom sx={{ fontWeight: 500 }}>
-                {formData.submissionDate}
-              </Typography>
-              
-              <Typography variant="subtitle1" color="textSecondary">
-                Priority
-              </Typography>
-              <Typography variant="body1" gutterBottom sx={{ fontWeight: 500 }}>
-                {formData.priority.charAt(0).toUpperCase() + formData.priority.slice(1)}
-              </Typography>
-              
-              <Typography variant="subtitle1" color="textSecondary">
-                Additional Details
-              </Typography>
-              <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                {formData.description || 'None'}
-              </Typography>
+              <List>
+                {formData.tasks.map((task, index) => (
+                  <Box key={task.id} sx={{ mb: 3, p: 2, backgroundColor: 'white', borderRadius: 2 }}>
+                    <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                      Task #{index + 1}
+                    </Typography>
+                    
+                    <ListItem disablePadding>
+                      <ListItemText 
+                        primary="Description" 
+                        secondary={task.task || 'None'} 
+                      />
+                    </ListItem>
+                    
+                    <ListItem disablePadding>
+                      <ListItemText 
+                        primary="Due Date" 
+                        secondary={task.dueDate || 'Not specified'} 
+                      />
+                    </ListItem>
+                    
+                    <ListItem disablePadding>
+                      <ListItemText 
+                        primary="Submission Date" 
+                        secondary={task.submissionDate || 'Not specified'} 
+                      />
+                    </ListItem>
+                    
+                    <ListItem disablePadding>
+                      <ListItemText 
+                        primary="Priority" 
+                        secondary={task.priority ? task.priority.charAt(0).toUpperCase() + task.priority.slice(1) : 'Not specified'} 
+                      />
+                    </ListItem>
+                    
+                    <ListItem disablePadding>
+                      <ListItemText 
+                        primary="Additional Details" 
+                        secondary={task.description || 'None'} 
+                      />
+                    </ListItem>
+                  </Box>
+                ))}
+              </List>
             </Box>
           </Box>
         );
@@ -353,7 +505,7 @@ const Assign = () => {
               Task Assignment
             </Typography>
             <Typography variant="body1" color="textSecondary" mb={3}>
-              Assign tasks to team members with detailed instructions
+              Assign multiple tasks to team members
             </Typography>
             
             <Stepper activeStep={activeStep} alternativeLabel sx={{ mb: 4 }}>
@@ -383,7 +535,7 @@ const Assign = () => {
                   color="primary"
                   onClick={handleSubmit}
                 >
-                  Assign Task
+                  Assign {formData.tasks.length} Task{formData.tasks.length > 1 ? 's' : ''}
                 </Button>
               ) : (
                 <Button
@@ -391,7 +543,7 @@ const Assign = () => {
                   color="primary"
                   onClick={handleNext}
                 >
-                  Next
+                  {activeStep === steps.length - 2 ? 'Review Tasks' : 'Next'}
                 </Button>
               )}
             </Box>

@@ -1,15 +1,37 @@
-import React from 'react'
-import Navbar from './components/navbar'
-import Assign from './components/assign'
-import Home from './components/home'  
+import React, { useState } from 'react'
+import Navbar from './components/Navbar'
+import Assign from './components/Assign'
+import Home from './components/Home'  
+import TeamManagement from './components/TeamManagement'
 import "bootstrap-icons/font/bootstrap-icons.css";
+// import ProfilePage from './components/ProfilePage'
+import AdminLogin from './components/AdminLogin'
+import MemberSignup from './components/MemberSignup'
+
+
+
 const App = () => {
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [signupOpen, setSignupOpen] = useState(false);
+
   return (
     <div>
-      <Home />
-      <Navbar />
+      <Navbar 
+        loginOpen={loginOpen} 
+        setLoginOpen={setLoginOpen}
+        signupOpen={signupOpen}
+        setSignupOpen={setSignupOpen}
+      />
+      <Home setLoginOpen={setLoginOpen} />
       <Assign />
-      </div>
+      <TeamManagement />
+      {/* <ProfilePage /> */}
+      <AdminLogin />
+      <MemberSignup />
+     
+  
+
+    </div>
   )
 }
 

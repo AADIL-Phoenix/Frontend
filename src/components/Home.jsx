@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import './Home.css';
 
-const Home = () => {
+const Home = ({ setLoginOpen }) => {
   // Sample data for the demo
   const tasks = [
     { 
@@ -88,8 +88,14 @@ const Home = () => {
               <h1 className="display-4 fw-bold mb-3">Professional Task Management</h1>
               <p className="lead mb-4">Streamline workflows, assign tasks efficiently, and track progress with our enterprise-grade solution</p>
               <div className="d-flex gap-3">
-                <Button variant="light" size="lg" className="fw-medium">Get Started</Button>
-                <Button variant="outline-light" size="lg" className="fw-medium">View Demo</Button>
+                <Button 
+                  variant="light" 
+                  size="lg" 
+                  className="fw-medium"
+                  onClick={() => setLoginOpen(true)}
+                >
+                  Get Started
+                </Button>
               </div>
             </div>
             <div className="col-lg-6 mt-5 mt-lg-0">
