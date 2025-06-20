@@ -11,52 +11,59 @@ import './Task.css';
 import { AiOutlineFileText } from 'react-icons/ai';
 import { MdErrorOutline, MdCheckCircle, MdAutorenew, MdHourglassEmpty, MdArrowDownward } from 'react-icons/md';
 import { FaFlag } from 'react-icons/fa';
+import { useParams } from 'react-router-dom';
 
-function createData(projectId, name, task, duedate, priority, status) {
-  return { projectId, name, task, duedate, priority, status };
+function createData(projectId, name, task, duedate, priority, status, assignedto) {
+  return { projectId, name, task, duedate, priority, status , assignedto};
 }
 
 const defaultRows = [
   // Project: Website Redesign (TSK-001)
-  createData('TSK-001', 'Website Redesign', 'Design homepage layout', '2025-06-20', 'High', 'Pending'),
-  createData('TSK-001', 'Website Redesign', 'Fix navbar responsiveness', '2025-06-20', 'High', 'Pending'),
-  createData('TSK-001', 'Website Redesign', 'Update hero section images', '2025-06-20', 'High', 'Pending'),
-  createData('TSK-001', 'Website Redesign', 'Test mobile responsiveness', '2025-06-20', 'High', 'Pending'),
-  createData('TSK-001', 'Website Redesign', 'Optimize CSS for performance', '2025-06-20', 'High', 'Pending'),
+  createData('TSK-001', 'Website Redesign', 'Design homepage layout', '2025-06-20', 'High', 'Pending','Neenu'),
+  createData('TSK-001', 'Website Redesign', 'Fix navbar responsiveness', '2025-06-20', 'High', 'Pending','Neenu'),
+  createData('TSK-001', 'Website Redesign', 'Update hero section images', '2025-06-20', 'High', 'Pending','Archa'),
+  createData('TSK-001', 'Website Redesign', 'Test mobile responsiveness', '2025-06-20', 'High', 'Pending','Archa'),
+  createData('TSK-001', 'Website Redesign', 'Optimize CSS for performance', '2025-06-20', 'High', 'Pending','Neenu'),
+  
 
   // Project: Mobile App
-  createData('TSK-002', 'Mobile App', 'Fix login crash on Android', '2025-06-18', 'High', 'Pending'),
+  createData('TSK-002', 'Mobile App', 'Fix login crash on Android', '2025-06-18', 'High', 'Pending','Adil'),
 
   // Project: API Development
-  createData('TSK-003', 'API Development', 'Create user profile endpoint', '2025-06-22', 'Medium', 'Completed'),
+  createData('TSK-003', 'API Development', 'Create user profile endpoint', '2025-06-22', 'Medium', 'Completed','Adil'),
 
   // Project: Testing Suite
-  createData('TSK-004', 'Testing Suite', 'Write unit tests for utils', '2025-06-19', 'Low', 'Pending'),
+  createData('TSK-004', 'Testing Suite', 'Write unit tests for utils', '2025-06-19', 'Low', 'Pending','Alisha'),
 
   // Project: Authentication Module
-  createData('TSK-005', 'Authentication Module', 'Implement password reset', '2025-06-21', 'High', 'Completed'),
+  createData('TSK-005', 'Authentication Module', 'Implement password reset', '2025-06-21', 'High', 'Completed','Alisha'),
 
   // Project: Analytics Integration
-  createData('TSK-006', 'Analytics Integration', 'Integrate Google Analytics', '2025-06-23', 'Medium', 'Pending'),
+  createData('TSK-006', 'Analytics Integration', 'Integrate Google Analytics', '2025-06-23', 'Medium', 'Pending','Adil'),
 
   // Project: Presentation Prep
-  createData('TSK-007', 'Presentation Prep', 'Create demo slides', '2025-06-24', 'Low', 'In Progress')
+  createData('TSK-007', 'Presentation Prep', 'Create demo slides', '2025-06-24', 'Low', 'In Progress','Alisha'),
 ];
 
 
 const Task = () => {
+  const { name } = useParams(); // 👈 get name from URL like /user/Neenu
   const [rows, setRows] = useState([]);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem('tasks'));
-    if (stored) {
-      setRows(stored);
-    } else {
-      setRows(defaultRows);
-      localStorage.setItem('tasks', JSON.stringify(defaultRows));
-    }
-  }, []);
+   useEffect(() => {
+  const stored = JSON.parse(localStorage.getItem('tasks'));
+
+  // Check if it's an array and has valid data
+  if (Array.isArray(stored) && stored.length > 0 && stored[0].assignedto) {
+    setRows(stored);
+  } else {
+    localStorage.setItem('tasks', JSON.stringify(defaultRows));
+    setRows(defaultRows);
+  }
+}, []);
+
+    
 
   const renderBadge = (value) => {
     const iconMap = {
@@ -96,9 +103,22 @@ const Task = () => {
       </span>
     );
   };
+  console.log("Name from URL:", name);
+console.log("All tasks:", rows.map(r => r.assignedto));
 
-  // Group tasks by projectId
-  const grouped = rows.reduce((acc, task) => {
+
+  const filteredRows = name
+  ? rows.filter(
+      (task) =>
+        task.assignedto &&
+        name &&
+        task.assignedto.toLowerCase() === name.toLowerCase()
+    )
+  : rows;
+
+
+  // ... then group and render filteredRows instead of rows
+  const grouped = filteredRows.reduce((acc, task) => {
     if (!acc[task.projectId]) {
       acc[task.projectId] = {
         projectId: task.projectId,
@@ -109,6 +129,7 @@ const Task = () => {
     acc[task.projectId].tasks.push(task);
     return acc;
   }, {});
+  
   const projects = Object.values(grouped);
 
   return (
@@ -134,7 +155,7 @@ const Task = () => {
               return (
                 <TableRow
                   key={project.projectId}
-                  onClick={() => navigate(`/submit/${project.projectId}`)}
+                  onClick={() => navigate(`/user/${name}/submit/${project.projectId}`)}
                   style={{ cursor: 'pointer' }}
                 >
                   <TableCell>{project.projectId}</TableCell>

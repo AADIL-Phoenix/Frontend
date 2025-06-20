@@ -1,9 +1,13 @@
 import React from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate ,useParams} from 'react-router-dom';
 import './DashboardLayout.css';
+import Navbar from '../Navbar';
 
 
 const DashboardLayout = () => {
+  const { name } = useParams();
+
+  
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -12,33 +16,33 @@ const DashboardLayout = () => {
       navigate('/');
     }
   };
+  ;
   return (
-    <div className="layout">
-      <aside className="sidebar">
-        <h2>User</h2>
-        <ul>
-          <li>
-            <NavLink to="/member/dashboard" className={({ isActive }) => isActive ? 'active' : ''}>
-              🏠 Dashboard
-            </NavLink>
-
-            <NavLink to="/member/tasks" className={({ isActive }) => isActive ? 'active' : ''}>
-              📋 My Tasks
-            </NavLink>
-          </li>
-          <li>
-            <button onClick={handleLogout} className="logout-button">
-              🚪 Logout
-            </button>
-          </li>
-        </ul>
-      </aside>
-
-      <main className="main-content">
-        <Outlet />
-      </main>
-    </div>
+    <>
+      <Navbar isUserDashboard />
+      <div className="layout">
+        <aside className="sidebar">
+          <h2>Hey {name}</h2>
+          <ul>
+            <li>
+              <NavLink to={`/user/${name}/dashboard`} className={({ isActive }) => isActive ? 'active' : ''}>
+                🏠 Dashboard
+              </NavLink>
+              <NavLink to={`/user/${name}/tasks`} className={({ isActive }) => isActive ? 'active' : ''}>
+                📋 My Tasks
+              </NavLink>
+            </li>
+            <li>
+              <button onClick={handleLogout} className="logout-button">
+                🚪 Logout
+              </button>
+            </li>
+          </ul>
+        </aside>
+        <main className="main-content">
+          <Outlet />
+        </main>
+      </div>
+    </>
   );
 };
-
-export default DashboardLayout;

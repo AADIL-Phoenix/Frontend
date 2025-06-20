@@ -1,21 +1,36 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Box, AppBar, Toolbar, Button, Menu, MenuItem, 
+import {
+  Box, AppBar, Toolbar, Button, Menu, MenuItem,
   Typography, IconButton, Avatar, Dialog
 } from '@mui/material';
 import AdminLogin from './AdminLogin';
 import MemberSignup from './MemberSignup';
 
-const Navbar = ({ loginOpen, setLoginOpen, signupOpen, setSignupOpen }) => {
+
+
+
+
+const Navbar = ({ isUserDashboard, loginOpen, setLoginOpen, signupOpen, setSignupOpen }) => {
+  const navigate = useNavigate();
+  const memberNames = ['Neenu', 'Archa', 'Adil', 'Alisha'];
+  const [memberMenuAnchor, setMemberMenuAnchor] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
   const [user, setUser] = useState(null);
   const [currentView, setCurrentView] = useState(null); // 'admin', 'member', or null
-  
+  const handleMemberClick = (event) => {
+    setMemberMenuAnchor(event.currentTarget);
+  };
+
+  const handleMemberSelect = (name) => {
+    setMemberMenuAnchor(null);
+    navigate(`/user/${encodeURIComponent(name)}`);
+  };
+
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
-const navigate = useNavigate();
+
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -30,14 +45,14 @@ const navigate = useNavigate();
   // Custom SVG icon
   const MenuIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+      <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
     </svg>
   );
 
   return (
     <>
-      <AppBar position="static" sx={{ 
-        backgroundColor: 'white', 
+      <AppBar position="static" sx={{
+        backgroundColor: 'white',
         color: '#333',
         boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
         borderBottom: '1px solid #eee'
@@ -81,7 +96,7 @@ const navigate = useNavigate();
                 }}></Box>
               </Box>
             </Box>
-            
+
             <Typography variant="h6" component="div" sx={{
               fontWeight: 700,
               background: 'linear-gradient(135deg, #3a8dff 0%, #6b5ce7 100%)',
@@ -92,7 +107,7 @@ const navigate = useNavigate();
               TaskFlow Pro
             </Typography>
           </Box>
-          
+
           {/* Role Selection Buttons */}
           {user ? (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -107,9 +122,9 @@ const navigate = useNavigate();
                 onClick={handleMenu}
                 color="inherit"
               >
-                <Avatar sx={{ 
-                  width: 36, 
-                  height: 36, 
+                <Avatar sx={{
+                  width: 36,
+                  height: 36,
                   bgcolor: '#6b5ce7',
                   fontSize: '1rem'
                 }}>
@@ -138,46 +153,59 @@ const navigate = useNavigate();
               </Menu>
             </Box>
           ) : (
-            <Box sx={{ display: 'flex', gap: 1 }}>
-              <Button 
-                variant="outlined" 
-                color="primary"
-                onClick={() => setLoginOpen(true)}
-                sx={{
-                  fontWeight: 600,
-                  borderRadius: '8px',
-                  px: 3,
-                  borderWidth: '2px',
-                  '&:hover': {
+            !isUserDashboard && (
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => setLoginOpen(true)}
+                  sx={{
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    px: 3,
                     borderWidth: '2px',
-                    backgroundColor: 'rgba(106, 92, 231, 0.05)'
-                  }
-                }}
-              >
-                Admin
-              </Button>
-              <Button 
-                variant="contained" 
-                color="primary"
-                onClick={() => navigate('/member')}
-
-                sx={{
-                  fontWeight: 600,
-                  borderRadius: '8px',
-                  px: 3,
-                  backgroundColor: '#6b5ce7',
-                  boxShadow: '0 4px 8px rgba(106, 92, 231, 0.3)',
-                  '&:hover': {
-                    backgroundColor: '#5a4bd0',
-                    boxShadow: '0 6px 12px rgba(106, 92, 231, 0.4)'
-                  }
-                }}
-              >
-                Member
-              </Button>
-            </Box>
+                    '&:hover': {
+                      borderWidth: '2px',
+                      backgroundColor: 'rgba(106, 92, 231, 0.05)'
+                    }
+                  }}
+                >
+                  Admin
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleMemberClick}
+                  sx={{
+                    fontWeight: 600,
+                    borderRadius: '8px',
+                    px: 3,
+                    backgroundColor: '#6b5ce7',
+                    boxShadow: '0 4px 8px rgba(106, 92, 231, 0.3)',
+                    '&:hover': {
+                      backgroundColor: '#5a4bd0',
+                      boxShadow: '0 6px 12px rgba(106, 92, 231, 0.4)'
+                    }
+                  }}
+                >
+                  Member
+                </Button>
+                <Menu
+                  anchorEl={memberMenuAnchor}
+                  open={Boolean(memberMenuAnchor)}
+                  onClose={() => setMemberMenuAnchor(null)}
+                >
+                  {memberNames.map(name => (
+                    <MenuItem key={name} onClick={() => handleMemberSelect(name)}>
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </Box>
+            )
           )}
-          
+
+
           {/* Mobile Menu Button */}
           <IconButton
             size="large"
@@ -193,7 +221,7 @@ const navigate = useNavigate();
 
       {/* Login Dialog */}
       <Dialog open={loginOpen} onClose={() => setLoginOpen(false)} maxWidth="xs" fullWidth>
-        <AdminLogin 
+        <AdminLogin
           setUser={setUser}
           switchToSignup={() => {
             setLoginOpen(false);
@@ -202,10 +230,10 @@ const navigate = useNavigate();
           onClose={() => setLoginOpen(false)}
         />
       </Dialog>
-      
+
       {/* Signup Dialog */}
       <Dialog open={signupOpen} onClose={() => setSignupOpen(false)} maxWidth="xs" fullWidth>
-        <MemberSignup 
+        <MemberSignup
           setUser={setUser}
           switchToLogin={() => {
             setSignupOpen(false);

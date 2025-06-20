@@ -2,9 +2,12 @@
 // src/components/TeamDashboard.jsx
 import React, { useEffect, useState } from 'react';
 import './TeamDashboard.css';
+import { useParams } from 'react-router-dom';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const TeamDashboard = () => {
+  const { name } = useParams(); // Get member name from route (e.g. /user/Neenu)
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good Morning';
@@ -39,12 +42,14 @@ const TeamDashboard = () => {
   // Mock task data
   const [tasks, setTasks] = useState([]);
 
-  useEffect(() => {
-    const storedTasks = JSON.parse(localStorage.getItem('tasks'));
-    if (storedTasks) {
-      setTasks(storedTasks);
-    }
-  }, []);
+ useEffect(() => {
+  const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  const filteredTasks = name
+    ? storedTasks.filter(task => task.assignedto?.toLowerCase() === name.toLowerCase())
+    : storedTasks;
+  setTasks(filteredTasks);
+}, [name]);
+
 
 
   const total = tasks.length;
@@ -75,7 +80,7 @@ const TeamDashboard = () => {
   return (
     <div className="dashboard-container">
       <div className="header-card">
-        <h2>{getGreeting()}! Neenu</h2>
+        <h2>{getGreeting()}!{name}</h2>
         <p>{getFormattedDate()}</p>
 
         <div className="task-summary">

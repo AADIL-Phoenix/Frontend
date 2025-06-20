@@ -36,14 +36,16 @@ const App = () => {
           }
         />
 
-        {/* User Dashboard Routes */}
-        <Route path="/member" element={<DashboardLayout />}>
+          {/* User-based Dashboard Routes */}
+        <Route path="/user/:name/*" element={<DashboardLayout />}>
           <Route index element={<Task />} />
           <Route path="dashboard" element={<TeamDashboard />} />
           <Route path="tasks" element={<Task />} />
           <Route path="submit/:projectId" element={<SubmitPage />} />
+
         </Route>
 
+        {/* Logout */}
         <Route path="/logout" element={<LogOut />} />
       </Routes>
     </Router>

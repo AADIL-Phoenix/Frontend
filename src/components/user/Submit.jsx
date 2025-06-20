@@ -4,23 +4,23 @@ import './Submit.css';
 import { ArrowLeft } from 'lucide-react';
 
 const SubmitPage = () => {
-  const { projectId } = useParams();
+  const { projectId, name } = useParams();
   const navigate = useNavigate();
   const [link, setLink] = useState('');
-  const [projectTasks, setProjectTasks] = useState([]);
   const [checkedTasks, setCheckedTasks] = useState({});
+  const [tasks, setTasks] = useState([]);
 
   useEffect(() => {
-    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    const relatedTasks = tasks.filter(t => t.projectId === projectId);
-    const initialChecked = {};
-    relatedTasks.forEach(task => {
-      initialChecked[task.task] = false;
-    });
+    const allTasks = JSON.parse(localStorage.getItem('tasks')) || [];
 
-    setProjectTasks(relatedTasks);
-    setCheckedTasks(initialChecked);
-  }, [projectId]);
+    const filteredTasks = allTasks.filter(
+      task =>
+        task.projectId === projectId &&
+        task.assignedto?.toLowerCase() === name?.toLowerCase()
+    );
+
+    setTasks(filteredTasks);
+  }, [projectId, name]);
 
   const handleCheck = (taskName) => {
     setCheckedTasks(prev => ({
@@ -30,31 +30,33 @@ const SubmitPage = () => {
   };
 
   const handleSubmit = () => {
-  const total = projectTasks.length;
-  const selected = projectTasks.filter(task => checkedTasks[task.task]).length;
+    const total = tasks.length;
+    const selected = tasks.filter(task => checkedTasks[task.task]).length;
 
-  let newStatus = 'Pending';
-  if (selected === total) newStatus = 'Completed';
-  else if (selected > 0) newStatus = 'In Progress';
+    let newStatus = 'Pending';
+    if (selected === total) newStatus = 'Completed';
+    else if (selected > 0) newStatus = 'In Progress';
 
-  const allTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-  const updatedTasks = allTasks.map(task => {
-    if (task.projectId === projectId) {
-      return {
-        ...task,
-        status: newStatus,
-        github: link
-      };
-    }
-    return task;
-  });
+    const allTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const updatedTasks = allTasks.map(task => {
+      if (
+        task.projectId === projectId &&
+        task.assignedto?.toLowerCase() === name?.toLowerCase()
+      ) {
+        return {
+          ...task,
+          status: newStatus,
+          github: link
+        };
+      }
+      return task;
+    });
 
-  localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-  navigate('/');
-};
+    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+    navigate(`/user/${name}/tasks`);
+  };
 
-
-  if (projectTasks.length === 0) return <p>Task not found</p>;
+  if (tasks.length === 0) return <p>Task not found</p>;
 
   return (
     <div className="submit-container">
@@ -66,14 +68,14 @@ const SubmitPage = () => {
       <form className="submit-form" onSubmit={e => { e.preventDefault(); handleSubmit(); }}>
         <div>
           <label>Project:</label>
-          <input type="text" value={projectTasks[0]?.name || ''} readOnly />
+          <input type="text" value={tasks[0]?.name || ''} readOnly />
         </div>
 
         <div>
           <label>Due Dates:</label>
           <input
             type="text"
-            value={projectTasks.map(t => t.duedate).join(', ')}
+            value={tasks.map(t => t.duedate).join(', ')}
             readOnly
           />
         </div>
@@ -81,7 +83,7 @@ const SubmitPage = () => {
         <div>
           <label>Tasks:</label>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-            {projectTasks.map(task => (
+            {tasks.map(task => (
               <label key={task.task}>
                 <input
                   type="checkbox"
