@@ -1,7 +1,8 @@
 import React from 'react';
-import { Box, TextField, Button, Typography, Link } from '@mui/material';
+import { Box, TextField, Button, Typography, Link, IconButton, DialogTitle, DialogContent } from '@mui/material';
+import { Close as CloseIcon } from '@mui/icons-material';
 
-const AdminLogin = ({ setUser, switchToSignup }) => {
+const AdminLogin = ({ setUser, switchToSignup, onClose }) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
@@ -12,13 +13,26 @@ const AdminLogin = ({ setUser, switchToSignup }) => {
       name: 'Admin User',
       initials: 'AU'
     });
+    // Close the dialog after successful login
+    onClose();
   };
 
   return (
-    <Box sx={{ maxWidth: 400, mx: 'auto', mt: 8, p: 3, boxShadow: 3, borderRadius: 2 }}>
-      <Typography variant="h5" component="h1" sx={{ mb: 2, fontWeight: 700, textAlign: 'center' }}>
-        Admin Login
-      </Typography>
+    <>
+      <DialogTitle sx={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center',
+        pb: 1
+      }}>
+        <Typography variant="h5" component="h1" sx={{ fontWeight: 700 }}>
+          Admin Login
+        </Typography>
+        <IconButton edge="end" color="inherit" onClick={onClose} aria-label="close">
+          <CloseIcon />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent>
       <form onSubmit={handleSubmit}>
         <TextField
           label="Email Address"
@@ -55,7 +69,8 @@ const AdminLogin = ({ setUser, switchToSignup }) => {
           </Link>
         </Typography>
       </form>
-    </Box>
+      </DialogContent>
+    </>
   );
 };
 

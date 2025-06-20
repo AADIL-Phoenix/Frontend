@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Box, AppBar, Toolbar, Button, Menu, MenuItem, 
-  Typography, IconButton, Avatar 
+  Typography, IconButton, Avatar, Dialog
 } from '@mui/material';
 import AdminLogin from './AdminLogin';
 import MemberSignup from './MemberSignup';
 
-const Navbar = () => {
+const Navbar = ({ loginOpen, setLoginOpen, signupOpen, setSignupOpen }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [user, setUser] = useState(null);
   const [currentView, setCurrentView] = useState(null); // 'admin', 'member', or null
@@ -14,6 +15,7 @@ const Navbar = () => {
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
+const navigate = useNavigate();
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -140,7 +142,7 @@ const Navbar = () => {
               <Button 
                 variant="outlined" 
                 color="primary"
-                onClick={() => setCurrentView('admin')}
+                onClick={() => setLoginOpen(true)}
                 sx={{
                   fontWeight: 600,
                   borderRadius: '8px',
@@ -157,7 +159,8 @@ const Navbar = () => {
               <Button 
                 variant="contained" 
                 color="primary"
-                onClick={() => setCurrentView('member')}
+                onClick={() => navigate('/member')}
+
                 sx={{
                   fontWeight: 600,
                   borderRadius: '8px',
@@ -188,20 +191,29 @@ const Navbar = () => {
         </Toolbar>
       </AppBar>
 
-      {/* Render the appropriate view
-      {currentView === 'admin' && (
+      {/* Login Dialog */}
+      <Dialog open={loginOpen} onClose={() => setLoginOpen(false)} maxWidth="xs" fullWidth>
         <AdminLogin 
           setUser={setUser}
-          switchToSignup={() => setCurrentView('member')}
+          switchToSignup={() => {
+            setLoginOpen(false);
+            setSignupOpen(true);
+          }}
+          onClose={() => setLoginOpen(false)}
         />
-      )}
+      </Dialog>
       
-      {currentView === 'member' && (
+      {/* Signup Dialog */}
+      <Dialog open={signupOpen} onClose={() => setSignupOpen(false)} maxWidth="xs" fullWidth>
         <MemberSignup 
           setUser={setUser}
-          switchToLogin={() => setCurrentView('admin')}
+          switchToLogin={() => {
+            setSignupOpen(false);
+            setLoginOpen(true);
+          }}
+          onClose={() => setSignupOpen(false)}
         />
-      )} */}
+      </Dialog>
     </>
   );
 };
