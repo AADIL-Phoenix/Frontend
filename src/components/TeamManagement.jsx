@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import InputAdornment from '@mui/material/InputAdornment';
 import { 
   Box, Grid, Card, CardContent, Avatar, Typography, 
@@ -12,6 +13,7 @@ import {
 } from '@mui/icons-material';
 
 const TeamManagement = () => {
+  const navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   const [newMember, setNewMember] = useState({
     name: '',
@@ -265,6 +267,7 @@ const TeamManagement = () => {
                       variant="outlined" 
                       startIcon={<Assignment />}
                       fullWidth
+                      onClick={() => navigate('/assign')}
                       sx={{ 
                         mb: 2,
                         borderColor: '#cbd5e0',
