@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { 
   Add, CheckCircle, 
-  Person, Email, Assignment, Star, Close,
+  Person, Email, Assignment, Close,
   Work, BusinessCenter, Task
 } from '@mui/icons-material';
 
@@ -18,46 +18,41 @@ const TeamManagement = () => {
     role: '',
     email: '',
     tasks: '',
-    completion: '',
-    rating: ''
+    completion: ''
   });
   
   const [teamMembers, setTeamMembers] = useState([
     {
       id: 1,
-      initials: 'JD',
-      name: 'John Doe',
+      initials: 'AR',
+      name: 'Archa',
       role: 'Developer',
       tasks: 5,
-      completion: 92,
-      rating: 4.8
+      completion: 92
     },
     {
       id: 2,
-      initials: 'JS',
-      name: 'Jane Smith',
+      initials: 'AA',
+      name: 'Aadil',
       role: 'Designer',
       tasks: 3,
-      completion: 78,
-      rating: 4.8
+      completion: 78
     },
     {
       id: 3,
-      initials: 'MJ',
-      name: 'Mike Johnson',
+      initials: 'AL',
+      name: 'Alisha',
       role: 'Project Manager',
       tasks: 2,
-      completion: 100,
-      rating: 4.8
+      completion: 100
     },
     {
       id: 4,
-      initials: 'SW',
-      name: 'Sarah Williams',
+      initials: 'NE',
+      name: 'Neenu',
       role: 'Frontend Developer',
       tasks: 4,
-      completion: 65,
-      rating: 4.8
+      completion: 65
     }
   ]);
 
@@ -70,8 +65,7 @@ const TeamManagement = () => {
       role: '',
       email: '',
       tasks: '',
-      completion: '',
-      rating: ''
+      completion: ''
     });
   };
 
@@ -89,8 +83,7 @@ const TeamManagement = () => {
         initials,
         ...newMember,
         tasks: parseInt(newMember.tasks) || 0,
-        completion: parseInt(newMember.completion) || 0,
-        rating: parseFloat(newMember.rating) || 4.8
+        completion: parseInt(newMember.completion) || 0
       };
       
       setTeamMembers([...teamMembers, member]);
@@ -288,20 +281,6 @@ const TeamManagement = () => {
                       Assign Task
                     </Button>
                     
-                    <Box sx={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      background: '#f8fafc',
-                      py: 1.2,
-                      borderRadius: '10px',
-                      border: '1px solid #f1f5f9'
-                    }}>
-                      <Star sx={{ color: '#f59e0b', mr: 1, fontSize: '1.2rem' }} />
-                      <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                        {member.rating} Rating
-                      </Typography>
-                    </Box>
                   </CardContent>
                 </Card>
               </Grid>

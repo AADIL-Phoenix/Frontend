@@ -2,19 +2,26 @@ import React from 'react';
 import { Box, TextField, Button, Typography, Link, IconButton, DialogTitle, DialogContent } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 
-const AdminLogin = ({ setUser, switchToSignup, onClose }) => {
+const AdminLogin = ({ setUser, switchToSignup, onClose, selectedAdmin }) => {
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // For demo purposes, simulate login
-    setUser({
-      name: 'Admin User',
-      initials: 'AU'
-    });
-    // Close the dialog after successful login
-    onClose();
+    
+    
+    if (selectedAdmin == 'Alex Morgan' && 
+        email == 'alex.morgan@taskflowpro.com' && 
+        password == 'admin123') {
+      setUser({
+        name: 'Alex Morgan',
+        initials: 'AM'
+      });
+      
+      onClose();
+    } else {
+      alert('Invalid credentials. Please try again.');
+    }
   };
 
   return (

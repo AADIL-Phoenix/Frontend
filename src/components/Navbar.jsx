@@ -13,18 +13,31 @@ import MemberSignup from './MemberSignup';
 
 const Navbar = ({ isUserDashboard, loginOpen, setLoginOpen, signupOpen, setSignupOpen }) => {
   const navigate = useNavigate();
-  const memberNames = ['Neenu', 'Archa', 'Adil', 'Alisha'];
-  const [memberMenuAnchor, setMemberMenuAnchor] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
+const memberNames = ['Neenu', 'Archa', 'Adil', 'Alisha'];
+const adminNames = ['Alex Morgan', 'Admin2', 'Admin3'];
+const [memberMenuAnchor, setMemberMenuAnchor] = useState(null);
+const [adminMenuAnchor, setAdminMenuAnchor] = useState(null);
+const [anchorEl, setAnchorEl] = useState(null);
   const [user, setUser] = useState(null);
-  const [currentView, setCurrentView] = useState(null); // 'admin', 'member', or null
   const handleMemberClick = (event) => {
     setMemberMenuAnchor(event.currentTarget);
   };
 
-  const handleMemberSelect = (name) => {
+const handleMemberSelect = (name) => {
     setMemberMenuAnchor(null);
     navigate(`/user/${encodeURIComponent(name)}`);
+  };
+
+  const handleAdminClick = (event) => {
+    setAdminMenuAnchor(event.currentTarget);
+  };
+
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
+
+  const handleAdminSelect = (name) => {
+    setAdminMenuAnchor(null);
+    setSelectedAdmin(name);
+    setLoginOpen(true);
   };
 
   const handleMenu = (event) => {
@@ -36,9 +49,13 @@ const Navbar = ({ isUserDashboard, loginOpen, setLoginOpen, signupOpen, setSignu
     setAnchorEl(null);
   };
 
+  const handleProfileClick = () => {
+    navigate('/profile');
+    handleClose();
+  };
+
   const handleLogout = () => {
     setUser(null);
-    setCurrentView(null);
     handleClose();
   };
 
@@ -147,8 +164,7 @@ const Navbar = ({ isUserDashboard, loginOpen, setLoginOpen, signupOpen, setSignu
                 onClose={handleClose}
                 sx={{ mt: 1 }}
               >
-                <MenuItem onClick={handleClose}>My Profile</MenuItem>
-                <MenuItem onClick={handleClose}>Account Settings</MenuItem>
+                <MenuItem onClick={handleProfileClick}>My Profile</MenuItem>
                 <MenuItem onClick={handleLogout}>Logout</MenuItem>
               </Menu>
             </Box>
@@ -158,7 +174,7 @@ const Navbar = ({ isUserDashboard, loginOpen, setLoginOpen, signupOpen, setSignu
                 <Button
                   variant="outlined"
                   color="primary"
-                  onClick={() => setLoginOpen(true)}
+                  onClick={handleAdminClick}
                   sx={{
                     fontWeight: 600,
                     borderRadius: '8px',
@@ -201,6 +217,17 @@ const Navbar = ({ isUserDashboard, loginOpen, setLoginOpen, signupOpen, setSignu
                     </MenuItem>
                   ))}
                 </Menu>
+                <Menu
+                  anchorEl={adminMenuAnchor}
+                  open={Boolean(adminMenuAnchor)}
+                  onClose={() => setAdminMenuAnchor(null)}
+                >
+                  {adminNames.map(name => (
+                    <MenuItem key={name} onClick={() => handleAdminSelect(name)}>
+                      {name}
+                    </MenuItem>
+                  ))}
+                </Menu>
               </Box>
             )
           )}
@@ -228,6 +255,7 @@ const Navbar = ({ isUserDashboard, loginOpen, setLoginOpen, signupOpen, setSignu
             setSignupOpen(true);
           }}
           onClose={() => setLoginOpen(false)}
+          selectedAdmin={selectedAdmin}
         />
       </Dialog>
 

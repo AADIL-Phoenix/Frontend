@@ -9,6 +9,7 @@ import Task from './components/user/Task';
 import SubmitPage from './components/user/Submit';
 import TeamDashboard from './components/user/TeamDashboard';
 import LogOut from './components/user/LogOut';
+import ProfilePage from './components/ProfilePage';
 import './App.css'; // if you have one
 
 const App = () => {
@@ -30,11 +31,13 @@ const App = () => {
                 setSignupOpen={setSignupOpen}
               />
               <Home setLoginOpen={setLoginOpen} />
-              <Assign />
-              <TeamManagement />
             </>
           }
         />
+
+        {/* Admin Routes */}
+        <Route path="/assign" element={<Assign />} />
+        <Route path="/team-management" element={<TeamManagement />} />
 
           {/* User-based Dashboard Routes */}
         <Route path="/user/:name/*" element={<DashboardLayout />}>
@@ -44,6 +47,9 @@ const App = () => {
           <Route path="submit/:projectId" element={<SubmitPage />} />
 
         </Route>
+
+        {/* Profile Page */}
+        <Route path="/profile" element={<ProfilePage />} />
 
         {/* Logout */}
         <Route path="/logout" element={<LogOut />} />
